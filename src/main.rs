@@ -205,6 +205,10 @@ pub struct SendArgs {
     /// Store the receive command in the clipboard.
     #[clap(short = 'c', long, action = clap::ArgAction::Count)]
     pub clipboard: u8,
+
+    /// Generate a qr code to scan for the recevie command.
+    #[clap(short = 'q', long, action = clap::ArgAction::Count)]
+    pub generate_qr: u8,
 }
 
 #[derive(Parser, Debug)]
@@ -665,6 +669,12 @@ async fn send(args: SendArgs) -> anyhow::Result<()> {
                 }
             }
             Err(e) => eprintln!("Could not access clipboard: {}", e),
+        }
+    }
+
+    if args.generate_qr > 0 {
+        if let Err(e) = qr2term::print_qr(format!("sendme receive {ticket}")) {
+            eprintln!("Could not generate qr code: {}", e);
         }
     }
 
